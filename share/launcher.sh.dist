@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 function sia_version() {
 
     sia_ver_tmp=$(sed -n '/Apache Tomcat Version/p' RELEASE-NOTES)
@@ -266,10 +267,10 @@ function sia_config() {
 currentDir=`pwd`
 ARGV=$2
 INSTNAME=$1
-TOMCAT_USER="vagrant"
+TOMCAT_USER="root"
 INSTANCE_LIST=`ls ${currentDir}/instance`
 TPATH=${currentDir}/tomcat-engine/bin/bootstrap.jar
-JAVA_HOME=${JAVA_HOME}
+JAVA_HOME=CHANGE_JAVA_HOME
 JAVA_OPTS="-Xmx2048m -Xms2048m -XX:PermSize=512m -XX:MaxPermSize=1024m"
 CATALINA_HOME=${currentDir}/tomcat-engine
 CATALINA_BASE=${currentDir}/instance/$1

@@ -15,7 +15,7 @@ if [[ ! ${JAVA_HOME} ]]; then
     fi
 fi
   
-`cp ./launcher.sh.dist ./launcher.sh` 
+`cp share/launcher.sh.dist ./launcher.sh` 
 sed -i -e "s:CHANGE_JAVA_HOME:${temp_java_home}:g" launcher.sh 
 
 mkdir instance
