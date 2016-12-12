@@ -16,7 +16,9 @@ if [[ ! ${JAVA_HOME} ]]; then
 fi
   
 `cp ./launcher.sh.dist ./launcher.sh` 
-sed -i -e "s:CHANGE_JAVA_HOME:${temp_java_home}:g" launcher.sh
+sed -i -e "s:CHANGE_JAVA_HOME:${temp_java_home}:g" launcher.sh 
+
+mkdir instance
 #echo ${temp_java_home}  
 #echo -e 'export JAVA_HOME='${temp_java_home} >> .setenv 
 

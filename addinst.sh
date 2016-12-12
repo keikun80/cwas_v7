@@ -54,9 +54,9 @@ function addInst() {
     mkdir -p ${INSTDIR}/temp
     mkdir -p ${INSTDIR}/work
     mkdir -p ${INSTDIR}/webapps
-
-    
-
+    cp -r share/web.xml ${INSTDIR}/${CONFDIR}/web.xml
+    cp -r share/webapps/ ${INSTDIR}/
+   
 #    cat > .tempconfig  << EOF
 ##!/bin/bash
 #sia_instname=${INSTNAME}
@@ -74,13 +74,13 @@ function addInst() {
 #export JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.jvmroute=\$sia_instname
 #EOF
     echo -e "#!/bin/bash"  >>                                                       ${INSTDIR}/${CONF}
-    echo -e "sia_instname=${INSTNAME} " >>                                          ${INSTDIR}/${CONF}
+    echo -e "sia_instname=\"${INSTNAME}\"" >>                                          ${INSTDIR}/${CONF}
     echo -e "sia_shutdown=${shutdownport}" >>                                       ${INSTDIR}/${CONF}
     echo -e "sia_http=${httpport}" >>                                               ${INSTDIR}/${CONF}
     echo -e "sia_https=${httpsport}" >>                                             ${INSTDIR}/${CONF}
     echo -e "sia_redirect=${redport}" >>                                            ${INSTDIR}/${CONF}
     echo -e "sia_ajp=${ajpport} " >>                                                ${INSTDIR}/${CONF}
-    echo -e "sia_jvmroute=${INSTNAME}" >>                                           ${INSTDIR}/${CONF} 
+    echo -e "sia_jvmroute=\"${INSTNAME}\"" >>                                           ${INSTDIR}/${CONF} 
     
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.shutdown=\$sia_shutdown\"" >> ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.http=\$sia_http\"" >>     ${INSTDIR}/${CONF}
@@ -89,7 +89,7 @@ function addInst() {
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.ajp=\$sia_ajp\"" >>           ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.jvmroute=\$sia_instname\"" >> ${INSTDIR}/${CONF} 
 
-    cp ${INSTROOT}/share/server.xml.dist ${INSTDIR}/${CONFDIR}/server.xml
+    cp ${INSTROOT}/share/server.xml.dist ${INSTDIR}/${CONFDIR}server.xml
 
 } 
 function removeInst() {  
