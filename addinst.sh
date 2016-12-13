@@ -19,7 +19,7 @@ function addInst() {
         exit
     fi 
  
-    echo -n "Instnace name : " ${INSTNAME} 
+    echo -e "Instnace name : " ${INSTNAME} 
     echo -n "Shutdown port (default : 8005) : " 
     read a
     if [[ $a ]]; then
