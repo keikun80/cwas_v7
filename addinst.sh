@@ -19,28 +19,28 @@ function addInst() {
         exit
     fi 
  
-    echo "Instnace name : " ${INSTNAME} 
-    echo "Shutdown port (default : 8005) : " 
+    echo -n "Instnace name : " ${INSTNAME} 
+    echo -n "Shutdown port (default : 8005) : " 
     read a
     if [[ $a ]]; then
        shutdownport=${a} 
     fi 
-    echo "http port (default : 8080) : "
+    echo -n "http port (default : 8080) : "
     read b 
     if [[ $b ]]; then
        httpport=${b} 
     fi 
-    echo "https port (default : 8443) : "
+    echo -n "https port (default : 8443) : "
     read c
     if [[ $c ]]; then
        httpsport=${c} 
     fi 
-    echo "redirect port (default : 8443) : "
+    echo -n "redirect port (default : 8443) : "
     read d 
     if [[ $c ]]; then
       redport=${d} 
     fi 
-    echo "ajp port (default : 8109) : "
+    echo -n "ajp port (default : 8109) : "
     read e  
     if [[ $e ]]; then
       ajpport=${e} 
