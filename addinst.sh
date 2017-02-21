@@ -20,14 +20,92 @@ function _front()
 function _footer()
 { 
 echo "FOOTER"
+} 
+
+# check JAVA_OPT  
+function _setjavahome()
+{
+    if [[ ! ${temp_java_home} ]]; then
+        echo -n -e "\e[32mEnter JAVA_HOME(JRE) for tomcat (default : \\e[2m${temp_java_home} ) : \e[0m"
+        read a
+        if [[ $a ]]; then
+            temp_java_home=${a}
+        else
+            echo -e "\e[91mYou should enter JAVA_HOME(JRE)\e[0m"   
+            exit;
+            #_setjavahome;
+        fi
+    else
+        echo -e "\e[32mTomcat will use this JAVA_HOME : \e[2m${temp_java_home}\e[0m" 
+        read -r -p "Continue[Y/n] : " response
+        case ${response} in
+            [yY][eE][sS]|[yY])
+                echo -e "\e[32mTomcat installing ...\e[0m" 
+                ;;
+            [nN][oO]|[nN])
+                temp_java_home=""
+                _setjavahome
+                ;;
+            *)
+                echo -n -e "\e[32mEnter JAVA_HOME(JRE) for tomcat (default : \\e[2m${temp_java_home} ) : \e[0m"
+                ;;
+        esac
+    fi
 }
+
+function _getjavaversion() 
+{
+    #echo -e -n "\e[32mChecking JAVA Version (java : ${temp_java_home}/bin/java -version ):"
+    echo -e -n "\e[32mChecking JAVA Version (java : ${temp_java_home}/bin/java -version ):"
+    #javav=`${temp_java_home}/bin/java -version 2>&1 | head -n 1 | awk -F '"' '{print $2}'`  
+    javav=`${temp_java_home}/bin/java -version 2>&1 | head -n 1 | awk -F '"' '{print $2}'`
+    echo -e ${javav}"\e[0m" 
+
+    if [ -z ${javav} ]; then
+        echo -e "\e[31mWrong JAVA_HOME path, Please check again JAVA_HOME\e[0m"  
+        exit;
+    fi
+}
+
+function _setjavaopt()
+{
+    echo -e "\e[32msetup JAVA_OPTS for ${javav} \e[0m"
+   jdk6=$(echo $javav | sed -n '/1.6.0/p')
+   jdk7=$(echo $javav | sed -n '/1.7.0/p')
+   jdk8=$(echo $javav | sed -n '/1.8.0/p')
+
+    if [ ! -z ${jdk6} ]; then
+        #SET JAVA_OPT 
+        #echo ${jdk6} 
+        #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms128m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=1024m\""
+        OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms2048m -Xmx2048m -XX:PermSize=512m -XX:MaxPermSize=1024m\""
+    fi
+
+    if [ ! -z ${jdk7} ]; then
+        #SET JAVA_OPT
+        #echo ${jdk7} 
+        #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -server -Xms128m -Xmx512m\""
+        OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms2048m -Xmx2048m -XX:PermSize=512m -XX:MaxPermSize=1024m\""
+    fi
+
+    if [ ! -z ${jdk8} ]; then
+        #SET JAVA_OPT
+        #echo ${jdk8}
+        #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -server -Xms128m -Xmx512m\""
+        OPT="export \"JAVA_OPTS=\$JAVA_OPTS -server -Xms1024m -Xmx512m -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=512m\""
+        #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms128m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=1024m\""
+    fi 
+    echo -e "export JAVA_HOME=${temp_java_home}" > .javaopts
+    echo -e ${OPT} >> .javaopts
+}
+
 function _setDefault()
 {
     shutdownport=8005
     httpport=8080
     httpsport=8443
     redport=${httpsport}
-    ajpport=8109
+    ajpport=8009
 }
 function addInst() { 
 
@@ -37,10 +115,11 @@ function addInst() {
     #CONFIG="sia.conf"
     #CONF=${CONFDIR}${CONFIG}    
     
-    if [ ! -f .javaopts ]; then  
-        echo -e "\e[31mCiritical] No file for setup JAVA_OTPS . Please run installer first\e[0m" 
-        exit;
-    fi 
+    #if [ ! -f .javaopts ]; then  
+    #    echo -e "\e[31mCiritical] No file for setup JAVA_OTPS . Please run installer first\e[0m" 
+    #    exit;
+    #fi  
+
     if [ -d ${INSTDIR} ]; then  
         echo -e "\e[33mAlready exist Instance name (${INSTNAME})\e[0m"
         echo -e "\e[93mExit script\e[0m" 
@@ -68,7 +147,7 @@ function addInst() {
     if [[ $c ]]; then
       redport=${d} 
     fi 
-    echo -e -n "\e[32majp port (default : 8109) : \e[0m"
+    echo -e -n "\e[32majp port (default : 8009) : \e[0m"
     read e  
     if [[ $e ]]; then
       ajpport=${e} 
@@ -83,25 +162,10 @@ function addInst() {
     mkdir -p ${INSTDIR}/temp
     mkdir -p ${INSTDIR}/work
     mkdir -p ${INSTDIR}/webapps
-    cp -r share/web.xml ${INSTDIR}/${CONFDIR}/web.xml
+    #cp -r share/conf/web.xml ${INSTDIR}/${CONFDIR}/web.xml 
+    cp -r share/conf ${INSTDIR}/.
     cp -r share/webapps/ ${INSTDIR}/
    
-#    cat > .tempconfig  << EOF
-##!/bin/bash
-#sia_instname=${INSTNAME}
-#sia_shutdown=${shutdownport}
-#sia_http=${httpport}
-#sia_https=${httpsport}
-#sia_redirect=${redport}
-#sia_ajp=${ajpport} 
-#sia_jvmroute=${INSTNAME}
-#export JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.shutdown=\$sia_instname
-#export JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.http=\$sia_shutdown
-#export JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.https=\$sia_http
-#export JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.redirect=\$sia_https
-#export JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.ajp=\$sia_ajp
-#export JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.jvmroute=\$sia_instname
-#EOF  
     echo -e "\e[32mcreate instance configuration for  \e[33m${INSTNAME} \e[0m"
 
     echo -e "#!/bin/bash"  >>                                                       ${INSTDIR}/${CONF}
@@ -112,16 +176,20 @@ function addInst() {
     echo -e "sia_redirect=${redport}" >>                                            ${INSTDIR}/${CONF}
     echo -e "sia_ajp=${ajpport} " >>                                                ${INSTDIR}/${CONF}
     echo -e "sia_jvmroute=\"${INSTNAME}\"" >>                                           ${INSTDIR}/${CONF} 
+   
+
+    cat .javaopts >> ${INSTDIR}/${CONF}
     
-    echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.shutdown=\$sia_shutdown\"" >> ${INSTDIR}/${CONF}
+    echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.shutdown=\$sia_shutdown\""  >> ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.http=\$sia_http\"" >>     ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.https=\$sia_https\"" >>        ${INSTDIR}/${CONF}
-    echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.redirect=\$sia_redirect\"">>     ${INSTDIR}/${CONF}
+    echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.redirect=\$sia_redirect\"" >>     ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.ajp=\$sia_ajp\"" >>           ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.jvmroute=\$sia_instname\"" >> ${INSTDIR}/${CONF} 
+   #echo -e "export \"JAVA_OPTS=\$JAVA_OPTS ${OPT}" >> ${INSTDIR}/${CONF} 
     
-    cat .javaopts >> ${INSTDIR}/${CONF}
-    cp ${INSTROOT}/share/server.xml.dist ${INSTDIR}/${CONFDIR}server.xml
+    #cat .javaopts >> ${INSTDIR}/${CONF}
+    cp ${INSTROOT}/share/dist/server.xml.dist ${INSTDIR}/${CONFDIR}server.xml
 
 } 
 function removeInst() {  
@@ -149,7 +217,8 @@ function _checkArgv()
 INSTNAME=$1 
 ARGV=$2   
 #currentDir=`pwd`
-INSTROOT=`pwd` 
+INSTROOT=`pwd`  
+temp_java_home="/etc/alternatives/jre";
 INSTDIR=${INSTROOT}/instance/${INSTNAME}
 CONFDIR="conf/"  
 CONFIG="sia.conf"
@@ -163,8 +232,11 @@ else
     _checkArgv 
 
     case $ARGV in 
-    add) 
-        _setDefault
+    add)  
+	_setjavahome
+	_getjavaversion
+	_setjavaopt
+        _setDefault 
         addInst
         ;;
     remove)
