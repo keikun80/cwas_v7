@@ -149,10 +149,10 @@ function _setlauncher()
     #sed -i -e "s:CHANGE_JAVA_HOME:${temp_java_home}:g" launcher.sh 
 
     chmod 700 ./launcher.sh 
-	chown -R ${WAS_USER}. *
     if [ ! -d instnace ]; then 
         mkdir -p instance
     fi
+    chown -R ${WAS_USER}. ${currentDir}
 }
 
 function _footer() 
