@@ -43,7 +43,8 @@ function _checkuser()
         GROUP_SW="-g ${APACHE_GROUP}"
         useradd ${GROUP_SW} -M -r -d ${currentDir} ${WAS_USER} -s /bin/bash > /dev/null 
         echo -e "\e[32m --Create USER/GROUP for Apache (${WAS_USER}/${WAS_GROUP})\e[0m"
-    fi
+    fi 
+    rm -f 1
 }
 
 
