@@ -61,7 +61,7 @@ function inst_list(){
 		inst_names[$k]=`basename ${i%%/}`  
 		let "k++"
 	done  
-	
+	inst_num=$k	
 	#echo ${inst_names[*]}	
 } 
 function sia_line() {

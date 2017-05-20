@@ -10,7 +10,98 @@ temp_java_home="/etc/alternatives";
 echo ${temp_java_home}
 echo ${CLASSPATH}  
 
+_RET=0 
 
+function _com_chk_install() 
+{ 
+	if [ -f ./launcher.sh ]; then  
+		whiptail --msgbox "Already installed Chlux Web Application Server"  8 50
+	else 
+		_RET=1
+	fi 
+}
+function _tui_front()
+{
+    TITLE="CHLUX TOMCAT MULII INSTANCE PACK INSTALLER"
+    clear
+    eval printf %.0s\# '{1..'${COLUMNS:-$(tput cols)}'}'; echo    
+    echo -e "" 
+    printf "%*s\n" $(((${#TITLE}+$(tput cols))/2)) "$TITLE"
+    echo -e "\t Version : 1.0" 
+    echo -e "\t Author  : Chlux Co,Ltd."
+    echo -e "\t Release : 25. Dec. 2016" 
+    echo -e "\t Package : APACHE TOMCAT 7.0"
+    echo -e "\t Require : Root Permission (Installation)"
+    echo -e ""
+    eval printf %.0s\# '{1..'${COLUMNS:-$(tput cols)}'}'; echo  
+
+}
+function _com_chk_eula()
+{  
+
+	if (whiptail --scrolltext --title "End user license agreement" --textbox tomcat-engine/LICENSE 40 90 ) then 
+		if (whiptail --title "Question" --yes-button "Agree" --no-button "Not Agree" --yesno "Are you agree?" 10 60) then    
+			_RET=$?
+		fi 
+	fi
+} 
+
+function _tui_install()
+{   
+	_com_chk_install  
+	if [ $_RET == 0 ]; then   
+		exit
+	else
+		_com_chk_eula
+	fi
+
+	WASUSER=`whoami` 
+
+	WASUSER=$(whiptail --inputbox "Enter Web Application  owner (default : [$WASUSER])" 8 78 $WASUSER --title "Owner"  3>&1 1>&2 2>&3) 
+	#WASGROUP=$(whiptail --inputbox "Enter Web Application  group (default : [$WAGROUP])" 8 78 $WASUSER --title "Owner"  3>&1 1>&2 2>&3)  
+
+	_RET=$? 
+
+	if [ $_RET != 0 ]; then  
+		exit
+	fi  
+	echo ${WASUSER}
+	if [ "root" == "${WASUSER}" ]; then  
+		whiptail --msgbox "root cannot be owner of Chlux Web Application Server" 10 90
+		exit
+	fi  
+
+	if [ $_RET = 0 ]; then
+		WASGROUP=$(whiptail --inputbox "Enter Web Application  group (default : [$WASUSER])" 8 78 $WASUSER --title "Owner"  3>&1 1>&2 2>&3)  
+		_RET=$?
+	else 
+		echo "user select cancel"
+	fi 
+
+	if [ $_RET != 0 ]; then  
+		exit
+	fi  
+	#echo $WASUSER
+	#echo $WASGROUP 
+
+    ret=false
+    getent passwd ${WASUSER} >/dev/null 2&>1 && ret=true 
+
+    if ${ret}; then 
+		whiptail --msgbox "Already exists ["${WASUSER}" / "$WASGROUP"] Chlux Web Application Server"  10 90 
+    else  
+        #groupadd ${APACHE_GROUP} > /dev/null 2&>1  
+        if [ ! $(getent group ${WASGROUP}) ]; then  
+            groupadd ${WASGROUP}
+        fi
+        GROUP_SW="-g ${WASGROUP}"
+        useradd ${GROUP_SW} -M -r -d ${currentDir} ${WASUSER} -s /bin/bash > /dev/null 
+        whiptail --msgbox "Create ["${WASUSER}"/"${WASGROUP}"] for WAS" 10 90
+    fi 
+    rm -f 1 
+
+	#echo "(Exit status was $exitstatus)"	
+}
 function _checkuser()
 {
     # Setup User / group for Apache
@@ -66,10 +157,6 @@ function _front()
 }
 
 
-#function _front_dialog()
-#{ 
-#	dialog --title "Tomcat instance manager" --msgbox "test" 10 50
-#}
 # check JAVA_OPT  
 function _setjavahome()
 { 
@@ -143,13 +230,29 @@ function _setjavaopt()
     echo -e ${OPT} > .javaopts
 }
 
+function _tui_setlauncher()
+{ 
+	{ 
+		for ((i = 0 ; i<=100 ; i+=5)); do 
+			sleep 0.1
+			echo $i
+		done
+    	cp share/dist/cwas.sh.dist ./cwas.sh
+    	chmod 700 ./cwas.sh
+    	if [ ! -d instnace ]; then 
+        	mkdir -p instance
+    	fi
+    	chown -R ${WASUSER}:${WASGROUP} ${currentDir} 
+	} | whiptail --gauge "Please wait .." 8 50 0 
+	whiptail --msgbox "Finish Installation" 8 50 
+}
 function _setlauncher() 
 {
     echo -e "\e[32mCreate launcher ... \e[0m"
-    cp share/dist/launcher.sh.dist ./launcher.sh
+    cp share/dist/cwas.sh.dist ./cwas.sh
     #sed -i -e "s:CHANGE_JAVA_HOME:${temp_java_home}:g" launcher.sh 
 
-    chmod 700 ./launcher.sh 
+    chmod 700 ./cwas.sh 
     if [ ! -d instnace ]; then 
         mkdir -p instance
     fi
@@ -165,12 +268,18 @@ JAVA_OPTS=""
 
 
 
-#_front_dialog
-_front 
-_checkuser
+#_tui_front 
+#_front 
+_tui_install
+#_checkuser 
+
+##########################################################
+# Disable Set javahome and opts , it moved to addinst.sh # 
+##########################################################
 #_setjavahome 
 #_getjavaversion  
-#_setjavaopt  
-_setlauncher 
-_footer
-exit;   
+#_setjavaopt   
+
+_tui_setlauncher
+#_setlauncher 
+#_footer
