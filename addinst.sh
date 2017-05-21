@@ -78,21 +78,21 @@ function _setjavaopt()
         #SET JAVA_OPT 
         #echo ${jdk6} 
         #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms128m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=1024m\""
-        OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms2048m -Xmx2048m -XX:PermSize=512m -XX:MaxPermSize=1024m\""
+        OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms1024m -Xmx2048m -XX:PermSize=512m -XX:MaxPermSize=1024m\"" 
     fi
 
     if [ ! -z ${jdk7} ]; then
         #SET JAVA_OPT
         #echo ${jdk7} 
         #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -server -Xms128m -Xmx512m\""
-        OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms2048m -Xmx2048m -XX:PermSize=512m -XX:MaxPermSize=1024m\""
+        OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms1024m -Xmx2048m -XX:PermSize=512m -XX:MaxPermSize=1024m\""
     fi
 
     if [ ! -z ${jdk8} ]; then
         #SET JAVA_OPT
         #echo ${jdk8}
         #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -server -Xms128m -Xmx512m\""
-        OPT="export \"JAVA_OPTS=\$JAVA_OPTS -server -Xms1024m -Xmx512m -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=512m\""
+        OPT="export \"JAVA_OPTS=\$JAVA_OPTS -server -Xms1024m -Xmx2048m -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=512m\""
         #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms128m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=1024m\""
     fi 
     echo -e "export JAVA_HOME=${temp_java_home}" > .javaopts
@@ -179,7 +179,7 @@ function addInst() {
    
 
     cat .javaopts >> ${INSTDIR}/${CONF}
-    
+    rm .javaopts 
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.shutdown=\$sia_shutdown\""  >> ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.http=\$sia_http\"" >>     ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.https=\$sia_https\"" >>        ${INSTDIR}/${CONF}
