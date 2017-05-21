@@ -85,7 +85,7 @@ function chlux_logo() {
     echo -e "    Developer : hjlee@chlux.co.kr, graudis@gmail.com "
     echo -e "    Version : \e[1;33m$sia_tomcat_ver \e[0m"
     echo -e " "
-    java_ver
+    #java_ver
     sia_line
 
 }
