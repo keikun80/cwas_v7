@@ -7,8 +7,8 @@ currentDir=`pwd`;
 #temp_java_home=${JAVA_HOME}
 temp_java_home="/etc/alternatives";
 
-echo ${temp_java_home}
-echo ${CLASSPATH}  
+#echo ${temp_java_home}
+#echo ${CLASSPATH}  
 
 _RET=0 
 
@@ -65,7 +65,7 @@ function _tui_install()
 	if [ $_RET != 0 ]; then  
 		exit
 	fi  
-	echo ${WASUSER}
+	#echo ${WASUSER}
 	if [ "root" == "${WASUSER}" ]; then  
 		whiptail --msgbox "root cannot be owner of Chlux Web Application Server" 10 90
 		exit
@@ -231,13 +231,17 @@ function _setjavaopt()
 }
 
 function _tui_setlauncher()
-{ 
+{  
+	echo ${WASUSER}
+   	cp ./share/dist/cwas.sh.dist ./cwas.sh 
+ 	sed -i -e "s:WAS_USER_SHOULD_CHANGE_HERE:${WASUSER}:g" ./cwas.sh
+ 	sed -i -e "s:WAS_GROUP_SHOULD_CHANGE_HERE:${WASGROUP}:g" ./cwas.sh
 	{ 
+		chmod 700 ./addinst.sh 
 		for ((i = 0 ; i<=100 ; i+=5)); do 
-			sleep 0.1
+			sleep 0.01
 			echo $i
 		done
-    	cp share/dist/cwas.sh.dist ./cwas.sh
     	chmod 700 ./cwas.sh
     	if [ ! -d instnace ]; then 
         	mkdir -p instance

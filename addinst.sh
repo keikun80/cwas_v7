@@ -14,7 +14,9 @@ function _front()
     echo -e ""
     #echo -e "\t INSTANCE NAME : "${INSTNAME}
     #echo -e "\t ACTION        : "$2 
-    eval printf %.0s\# '{1..'${COLUMNS:-$(tput cols)}'}'; echo  
+    eval printf %.0s\# '{1..'${COLUMNS:-$(tput cols)}'}'; echo   
+	UNAME=`id -u -n`
+ 
 } 
 
 function _footer()
@@ -55,9 +57,7 @@ function _setjavahome()
 
 function _getjavaversion() 
 {
-    #echo -e -n "\e[32mChecking JAVA Version (java : ${temp_java_home}/bin/java -version ):"
     echo -e -n "\e[32mChecking JAVA Version (java : ${temp_java_home}/bin/java -version ):"
-    #javav=`${temp_java_home}/bin/java -version 2>&1 | head -n 1 | awk -F '"' '{print $2}'`  
     javav=`${temp_java_home}/bin/java -version 2>&1 | head -n 1 | awk -F '"' '{print $2}'`
     echo -e ${javav}"\e[0m" 
 
@@ -94,9 +94,13 @@ function _setjavaopt()
         #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -server -Xms128m -Xmx512m\""
         OPT="export \"JAVA_OPTS=\$JAVA_OPTS -server -Xms1024m -Xmx2048m -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=512m\""
         #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms128m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=1024m\""
-    fi 
-    echo -e "export JAVA_HOME=${temp_java_home}" > .javaopts
-    echo -e ${OPT} >> .javaopts
+    fi  
+	
+	FIXEDOPT="export \"JAVA_OPTS=\$JAVA_OPTS -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -Djava.awt.headless=true -Dcom.sun.management.jmxremote\""
+    
+	echo -e "export JAVA_HOME=${temp_java_home}" > .javaopts
+    echo -e ${OPT} >> .javaopts 
+    echo -e ${FIXEDOPT} >> .javaopts 
 }
 
 function _setDefault()
@@ -196,10 +200,10 @@ function removeInst() {
     `rm -rf ${INSTDIR}`
 }
 
-function _checkArgv()
+function _confirm()
 { 
     echo -e "\e[32mWill you create this instance  : \e[33m${INSTNAME}\e[0m" 
-    read -r -p "Continue[Y/n] : " response
+    read -r -p "Continue[y/N] : " response
     case ${response} in
             [yY][eE][sS]|[yY])
                 echo -e "\e[32mStart create instance \e[33m"${INSTNAME}"...\e[0m" 
@@ -216,7 +220,6 @@ function _checkArgv()
 } 
 INSTNAME=$1 
 ARGV=$2   
-#currentDir=`pwd`
 INSTROOT=`pwd`  
 temp_java_home="/etc/alternatives/jre";
 INSTDIR=${INSTROOT}/instance/${INSTNAME}
@@ -229,18 +232,19 @@ if [ "$#" -ne 2 ]; then
     exit
 else 
     _front 
-    _checkArgv 
-
-    case $ARGV in 
-    add)  
+    case $2 in 
+    "add" )   
+	_confirm
 	_setjavahome
 	_getjavaversion
 	_setjavaopt
         _setDefault 
         addInst
         ;;
-    remove)
+    "remove" )
         removeInst  
-        ;;
+        ;; 
+	*)
+		exit
     esac 
 fi

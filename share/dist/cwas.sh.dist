@@ -54,15 +54,21 @@ function java_ver() {
 #}
 
 function inst_list(){ 
-	instanceList=`ls -d ${currentDir}/instance/*`   
-	k=0
-	for i in $(ls -d ${currentDir}/instance/*)
-	do   
-		inst_names[$k]=`basename ${i%%/}`  
-		let "k++"
-	done  
-	inst_num=$k	
-	#echo ${inst_names[*]}	
+	instanceList=`ls ${currentDir}/instance/ | wc -l`    
+	if [ $instanceList -gt 0 ]; then
+		k=0
+		for i in $(ls -d ${currentDir}/instance/*)
+		do   
+			inst_names[$k]=`basename ${i%%/}`  
+			let "k++"
+		done  
+		inst_num=$k	
+		#echo ${inst_names[*]}	 
+	else   
+		sia_line
+		echo "   Please create instance first"
+		echo "   addinst.sh [Instance] add"
+	fi 
 } 
 function sia_line() {
 
@@ -85,7 +91,8 @@ function chlux_logo() {
     echo -e "    Developer : hjlee@chlux.co.kr, graudis@gmail.com "
     #echo -e "    Version : \e[1;33m$sia_tomcat_ver \e[0m"
     echo -e " "
-    #java_ver
+    #java_ver 
+	chown -R ${CWAS_USER}.${CWAS_GROUP} *
     sia_line
 
 }
@@ -127,16 +134,15 @@ function sia_port() {
 }
 
 function sia_start() {
-    inst_list
+    inst_list 
     runinst=$(ps -ef | grep ${TPATH} | grep -v grep |  grep $CATALINA_BASE | awk {'print $2 $16'})
     UNAME=`id -u -n` 
     chlux_logo
 	chlux_logo_tail 
 
-    if [ e$UNAME != "e$TOMCAT_USER" ]; then
+    if [ e$UNAME != "e$CWAS_USER" ]; then
 
-        #echo -e " [\e[1;31m Use by only user account\e[0m [ \e[33m$TOMCAT_USER\e[0m ] Start Fail WAS SERVER - \e[1;33m$INSTNAME\e[0m ]" 
-        echo -e " Use by only user account [$TOMCAT_USER] Start Fail WAS SERVER - $INSTNAME"
+        echo -e " Use by only user account [$CWAS_USER] Start Fail WAS SERVER - $INSTNAME"
 
         sia_line 
 
@@ -272,7 +278,8 @@ currentDir=`pwd`
 ARGV=$2
 INSTNAME=$1 
 
-TOMCAT_USER="was"
+CWAS_USER="WAS_USER_SHOULD_CHANGE_HERE"
+CWAS_GROUP="WAS_GROUP_SHOULD_CHANGE_HERE"
 
 #INSTANCE_LIST=`ls ${currentDir}/instance` 
 TPATH=${currentDir}/tomcat-engine/bin/bootstrap.jar
