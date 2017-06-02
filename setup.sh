@@ -237,7 +237,7 @@ function _tui_setlauncher()
  	sed -i -e "s:WAS_USER_SHOULD_CHANGE_HERE:${WASUSER}:g" ./cwas.sh
  	sed -i -e "s:WAS_GROUP_SHOULD_CHANGE_HERE:${WASGROUP}:g" ./cwas.sh
 	{ 
-		chmod 700 ./addinst.sh 
+		chmod 700 ./instmanager.sh 
 		for ((i = 0 ; i<=100 ; i+=5)); do 
 			sleep 0.01
 			echo $i
