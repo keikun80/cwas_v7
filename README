@@ -15,4 +15,8 @@ Remove Instance
  - instmanager [INSTANCE_NAME] remove  
 
 Running Instance
- - host]#./cwas [INSTANACE_NAME] start
+ - host]#./cwas [INSTANACE_NAME] start 
+
+
+REFERENCE
+http://tomcat.apache.org/tomcat-7.0-doc/index.html
