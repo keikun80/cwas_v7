@@ -14,7 +14,7 @@ _RET=0
 
 function _com_chk_install() 
 { 
-	if [ -f ./launcher.sh ]; then  
+	if [ -f ./cwas ]; then  
 		whiptail --msgbox "Already installed Chlux Web Application Server"  8 50
 	else 
 		_RET=1
@@ -39,7 +39,7 @@ function _tui_front()
 function _com_chk_eula()
 {  
 
-	if (whiptail --scrolltext --title "End user license agreement" --textbox tomcat-engine/LICENSE 40 90 ) then 
+	if (whiptail --scrolltext --title "End user license agreement" --textbox engine/LICENSE 40 90 ) then 
 		if (whiptail --title "Question" --yes-button "Agree" --no-button "Not Agree" --yesno "Are you agree?" 10 60) then    
 			_RET=$?
 		fi 
@@ -233,16 +233,16 @@ function _setjavaopt()
 function _tui_setlauncher()
 {  
 	echo ${WASUSER}
-   	cp ./share/dist/cwas.sh.dist ./cwas.sh 
+   	cp ./share/dist/cwas.sh.dist ./cwas
  	sed -i -e "s:WAS_USER_SHOULD_CHANGE_HERE:${WASUSER}:g" ./cwas.sh
  	sed -i -e "s:WAS_GROUP_SHOULD_CHANGE_HERE:${WASGROUP}:g" ./cwas.sh
 	{ 
-		chmod 700 ./instmanager.sh 
+		chmod 700 ./instmanager
 		for ((i = 0 ; i<=100 ; i+=5)); do 
 			sleep 0.01
 			echo $i
 		done
-    	chmod 700 ./cwas.sh
+    	chmod 700 ./cwas
     	if [ ! -d instnace ]; then 
         	mkdir -p instance
     	fi
@@ -253,10 +253,10 @@ function _tui_setlauncher()
 function _setlauncher() 
 {
     echo -e "\e[32mCreate launcher ... \e[0m"
-    cp share/dist/cwas.sh.dist ./cwas.sh
+    cp share/dist/cwas.sh.dist ./cwas
     #sed -i -e "s:CHANGE_JAVA_HOME:${temp_java_home}:g" launcher.sh 
 
-    chmod 700 ./cwas.sh 
+    chmod 700 ./cwas
     if [ ! -d instnace ]; then 
         mkdir -p instance
     fi
