@@ -282,10 +282,10 @@ CWAS_USER="WAS_USER_SHOULD_CHANGE_HERE"
 CWAS_GROUP="WAS_GROUP_SHOULD_CHANGE_HERE"
 
 #INSTANCE_LIST=`ls ${currentDir}/instance` 
-TPATH=${currentDir}/tomcat-engine/bin/bootstrap.jar
+TPATH=${currentDir}/engine/bin/bootstrap.jar
 #JAVA_HOME=CHANGE_JAVA_HOME
 #JAVA_OPTS="-Xmx2048m -Xms2048m -XX:PermSize=512m -XX:MaxPermSize=1024m"
-CATALINA_HOME=${currentDir}/tomcat-engine
+CATALINA_HOME=${currentDir}/engine
 CATALINA_BASE=${currentDir}/instance/$1
 export JAVA_HOME JAVA_OPTS CATALINA_HOME CATALINA_BASE
 
