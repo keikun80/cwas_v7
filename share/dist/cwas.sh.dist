@@ -1,60 +1,6 @@
 #!/bin/sh
 
-
-function sia_version() {
-
-    sia_ver_tmp=$(sed -n '/Apache Tomcat Version/p' RELEASE-NOTES)
-    sia_tomcat_ver=$(echo $sia_ver_tmp | sed -e 's/^ *//g' -e 's/ *$//g')
-}
-
-function java_ver() {
-
-#    echo -e "    JDK Info "
-#    echo " "
-    javainfo_tmp=`ls -al $JAVA_HOME`
-    javainfo_tmp1=$(echo $javainfo_tmp | awk -F"->" '{print $2}' )
-    javainfo_jdk6=$(echo $javainfo_tmp1 | sed -n '/1.6.0/p')
-    javainfo_jdk7=$(echo $javainfo_tmp1 | sed -n '/1.7.0/p')
-    javainfo_jdk8=$(echo $javainfo_tmp1 | sed -n '/1.8.0/p')
-
-#    java_ver=$(sed 'i\    \' $java_ver_tmp)
-    if [ ! -z $javainfo_jdk6 ]; then
-	javainfo=$javainfo_jdk6
-	sia_available="Tomcat 7"
-	jdk_chk="0"
-    fi    
-    if [ ! -z $javainfo_jdk7 ]; then
-        javainfo=$javainfo_jdk7
-        sia_available="Tomcat 7,8"
-        jdk_chk="0"
-    fi
-    if [ ! -z $javainfo_jdk8 ]; then
-        javainfo=$javainfo_jdk8
-        sia_available="Tomcat 7,8,9"
-        jdk_chk="1"
-    fi
-
-    echo -e "    JDK PATH : "$javainfo
-    echo -e "    Version available : "$sia_available
-    echo " "
-}
-
-#function inst_list() {
-# 
-#    inst_num=`ls -l ${currentDir}/instance | grep ^d | wc -l`
-#    #inst_names_tmp=`ls -l ${currentDir}/instance | grep ^d | awk {'print $8'}`
-#    inst_names_tmp=`ls -l ${currentDir}/instance | grep ^d | awk {'print $9'}`
-##    echo " num= "$instance_num
-##    echo " names= "$inst_names_tmp
-#    inst_names=($inst_names_tmp)
-##    for ((i=0; i<$instance_num; i++));
-##    do
-##        echo " inst= "${inst_names[$i]}
-##    done
-#}
-
-#unction inst_list(){ 
-function getInstance(){ 
+getInstance(){ 
 	instanceList=`ls ${currentDir}/instance/ | wc -l`    
 	if [ $instanceList -gt 0 ]; then
 		k=0
@@ -71,7 +17,7 @@ function getInstance(){
 		echo "   addinst.sh [Instance] add"
 	fi 
 } 
-function sia_line() {
+sia_line() {
 
     echo -e " \e[1;37m=========================================================================\e[0m"
 
@@ -83,13 +29,12 @@ cwas_header() {
     echo " "
     sia_line
     echo -e " "
-    echo -e "   \e[1;34m Chlux Web Application Server 1.0.2b" 
+    echo -e "   \e[1;34m Chlux Web Application Server 1.0.2c" 
+    echo -e " "
+    echo -e "    Website      : http://www.github.com/chluxossteam"
+    echo -e "    Pubilshed by : chluxossteam <help@chlux.co.kr>"
     echo -e " "
     echo -e "    Copyright(c) 2017 By CHLUX Co.Ltd. All rights reserved. "
-    echo -e " "
-    echo -e "    http://www.github.com/chluxossteam"
-    echo -e "    Pubilshed by  : chluxossteam <help@chlux.co.kr>"
-    echo -e "    Maintainer    : Hyung Joon, Lee <hjlee@chlux.co.kr>"
     #echo -e "    Version : \e[1;33m$sia_tomcat_ver \e[0m"
     echo -e " "
     #java_ver 
@@ -110,12 +55,12 @@ cwas_footer() {
     sia_line
 }
 
-function not_run() {
+not_run() {
     echo -e " \e[1;34m Not Running Tomcat Instance\e[0m [ \e[1;35m$INSTNAME\e[0m ] !!! "
 
 }
 
-function sia_port() {
+sia_port() {
     #source $CATALINA_BASE/conf/sia.conf
     echo -e "  [ Instance Running Infomation ]"
     echo -e "  Instance Name = "$INSTNAME
@@ -130,7 +75,9 @@ function sia_port() {
     echo -e "  SIA JVM Route = "$sia_jvmroute
 }
 
-function cwas_start() { 
+cwas_start() {  
+	echo "  Instance start message"
+	echo " " 
 	for ((i=0; i< $instanceNum; i++)) 
 	do   
 		if [ ${INSTNAME} == ${instanceNames[$i]} ]; then   
@@ -162,7 +109,9 @@ function cwas_start() {
 
 }
 
-function cwas_stop() {
+cwas_stop() {
+	echo "  Instance stop message"
+	echo " " 
 	
     runinst=$(ps -ef | grep tomcat | grep $TPATH | grep -w $CATALINA_BASE)
     if [ ! -z "$runinst" ]; then
@@ -183,13 +132,15 @@ function cwas_stop() {
 
 }
 
-function cwas_status() {
+cwas_status() {
+	echo "  Instance status message"
+	echo " " 
 
     instcount=$(ps -ef | grep ${TPATH} | grep -v grep |  wc -l)
     instpid=$(ps -ef | grep ${TPATH} | grep -v grep |  grep -w $INSTNAME | awk {'print $2'})
-    echo "Total Instance Running Counter = [ ${instcount}"
+    echo "  Total Instance Running Counter = [ ${instcount} ]"
     if [ ! -z "$instpid" ]; then
-        echo "Tomcat Instance Name = ${INSTNAME} [ PID : ${instpid} ] "
+        echo "  Tomcat Instance Name = ${INSTNAME} [ PID : ${instpid} ] "
     else
         not_run
     fi
@@ -199,32 +150,43 @@ function cwas_status() {
 
 }
 
-function cwas_kill() {
+cwas_kill() {
+	echo "  Instance kill message"
+	echo " " 
 
-    chlux_logo
-    chlux_logo_tail
-    killPID=$(ps -ef | grep $TPATH | grep -v grep | grep -w $INSTNAME | awk {'print $2'})
-    echo -e " \e[1;31mProcess Kill Instance \e[1;33m"$INSTNAME"\e[0m [ PID : \e[1;33m"$killPID"\e[0m ] \e[1;31mTerminated !!! \e[0m"
-    ps -ef | grep tomcat | grep $TPATH | grep -v grep | grep -w $INSTNAME | awk '{ printf("kill -9 %s\n", $2); }' > tmp.$$
-    sh tmp.$$
-    rm -f tmp.$$
+    killPID=$(ps -ef | grep $TPATH | grep -v grep | grep -w $INSTNAME | awk {'print $2'}) 
+	if [ ! -z ${killPID} ]; then
+    	echo -e " \e[1;31mProcess Kill Instance \e[1;33m"$INSTNAME"\e[0m [ PID : \e[1;33m"$killPID"\e[0m ] \e[1;31mTerminated !!! \e[0m"
+    	ps -ef | grep tomcat | grep $TPATH | grep -v grep | grep -w $INSTNAME | awk '{ printf("kill -9 %s\n", $2); }' > tmp.$$
+    	sh tmp.$$
+    	rm -f tmp.$$ 
+	else  
+		echo "No process for ${INSTNAME}"
+	fi
     sia_line
     echo " "
 
 }
 
-function cwas_thread() {
+cwas_thread() {
+	echo "  Instance thread message"
+	echo " "  
 
-    threadPID=$(ps -ef | grep $TPATH | grep -v grep | grep -w $INSTNAME | awk {'print $2'})
-    threadCount=$(ps uH $threadPID | wc -l )
-    echo -e " \e[1;37m Instance ID \e[1;33m"$INSTNAME"\e[0m [ PID : \e[1;33m"$threadPID"\e[0m / THREAD : \e[1;33m"$threadCount"\e[0m ]"
+    threadPID=$(ps -ef | grep $TPATH | grep -v grep | grep -w $INSTNAME | awk {'print $2'}) 
+	if [ ! -z ${threadPID} ]; then
+    	threadCount=$(ps uH $threadPID | wc -l )
+    	echo -e " \e[1;37m Instance ID \e[1;33m"$INSTNAME"\e[0m [ PID : \e[1;33m"$threadPID"\e[0m / THREAD : \e[1;33m"$threadCount"\e[0m ]" 
+	else  
+		echo "  Cannot find ${INSTNAME} process"
+	fi 
     sia_line
     echo " "
 
 }
 
-function cwas_log() {
-
+cwas_log() {
+	echo "  Instance log message"
+	echo "  Escape : CTRL^C"  
     echo -e " \e[1;32m Tomcat Instance \e[0m [ \e[1;33m$INSTNAME\e[0m ] \e[1;32mCatalina Log View  \e[0m"
     sia_line
     echo " "
@@ -232,12 +194,12 @@ function cwas_log() {
 
 }
 
-function cwas_config() {
+cwas_config() {
 
-    vim $CATALINA_BASE/conf/sia.conf
+    vi $CATALINA_BASE/conf/sia.conf
 }
 
-usageprint()
+_usageprint()
 { 
 
     if [ ! -z $ARGV ]; then 
@@ -263,9 +225,12 @@ chkInstance()
 		echo -e "  Status : Does not exists [ \e[1;31m$1\e[0m ] instance"
 		exit
 	fi
-}
+} 
+
+
+
 if [ 2 != $# ]; then   
-	usageprint	 
+	_usageprint	 
 	exit
 fi  
 
@@ -282,7 +247,8 @@ cwas_header
 chkOwner  
 chkInstance $CATALINA_BASE
 getInstance 
-cwas_footer
+cwas_footer 
+
 export JAVA_HOME JAVA_OPTS CATALINA_HOME CATALINA_BASE
 source $CATALINA_BASE/conf/sia.conf
 #. $CATALINA_BASE/conf/sia.conf 
@@ -318,17 +284,17 @@ log)
 restart)
     ARGV=stop
     cwas_stop
-    while (true) 
-    do
-        siaPID=$(ps -ef | grep ${TPATH} | grep -v grep | grep -w ${CATALINA_BASE} | awk {'print $2'})
+    #while (true) 
+    #do
+   	siaPID=$(ps -ef | grep ${TPATH} | grep -v grep | grep -w ${CATALINA_BASE} | awk {'print $2'})
 	if [ ! -z "$siaPID" ]; then
-            sleep 1.5
+    	sleep 1.5
 	else 
-	    ARGV=start
-	    cwas_start
+		ARGV=start
+		cwas_start
 	    exit
 	fi
-    done
+    #done
     ;;
 
 config)
@@ -336,7 +302,7 @@ config)
     ;;
 
 *) 
-	usageprint
+	_usageprint
     ;;
 esac
 
