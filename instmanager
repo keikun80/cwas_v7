@@ -99,7 +99,8 @@ function _setjavaopt()
 	
 	FIXEDOPT="export \"JAVA_OPTS=\$JAVA_OPTS -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -Djava.awt.headless=true -Dcom.sun.management.jmxremote\""
     
-	echo -e "export JAVA_HOME=${temp_java_home}" > .javaopts
+    echo -e "export \"JAVA_OPTS=\"\"\""  > .javaopts
+	echo -e "export JAVA_HOME=${temp_java_home}" >> .javaopts
     echo -e ${OPT} >> .javaopts 
     echo -e ${FIXEDOPT} >> .javaopts 
 }
@@ -192,7 +193,8 @@ function addInst() {
    
 
     cat .javaopts >> ${INSTDIR}/${CONF}
-    rm .javaopts 
+    rm .javaopts  
+    #echo -e "export \"JAVA_OPTS=\"\"\""  >> ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.shutdown=\$sia_shutdown\""  >> ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.http=\$sia_http\"" >>     ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.https=\$sia_https\"" >>        ${INSTDIR}/${CONF}
