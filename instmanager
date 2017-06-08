@@ -245,8 +245,8 @@ INSTNAME=$1
 ARGV=$2   
 INSTROOT=`pwd`   
 
-CWAS_USER="was"
-CWAS_GROUP="was" 
+CWAS_USER="WAS_USER_SHOULD_CHANGE_HERE"
+CWAS_GROUP="WAS_GROUP_SHOULD_CHANGE_HERE" 
 
 temp_java_home="/etc/alternatives/jre";
 INSTDIR=${INSTROOT}/instance/${INSTNAME}
