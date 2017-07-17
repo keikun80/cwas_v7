@@ -208,11 +208,17 @@ _usageprint()
         echo ""
         echo "Help for CWAS command"
         echo "1. You can have action for exists instance"
-        echo "   - action command"
-        echo "    shell >./cwas [instance] [ start | stop | status | log | kill | thread]"
+        echo "  - action command"
+        echo "  shell >./cwas [instance] [ start | stop | status | log | kill | thread]"
         echo ""
         echo "2. Read this message or just check instance list"
-        echo '    sheel >./cwas'
+        echo "  sheel >./cwas" 
+		echo ""
+		echo "3. Instance manager" 
+        echo "  - Add instance"
+        echo "  shell >./instmanager [instance] add" 
+        echo "  - Remove instance"
+        echo "  shell >./instmanager [instance] remove" 
 
     fi
 }
