@@ -18,6 +18,7 @@ package compressionFilters;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -41,25 +42,26 @@ import javax.servlet.http.HttpServletResponse;
 public class CompressionFilter implements Filter {
 
     /**
+     * Minimal reasonable threshold.
+     */
+    private static final int MIN_THRESHOLD = 128;
+
+    /**
+     * Minimal reasonable buffer.
+     */
+    // 8KB is what tomcat would use by default anyway
+    private static final int MIN_BUFFER = 8192;
+
+    /**
      * The filter configuration object we are associated with.  If this value
      * is null, this filter instance is not currently configured.
      */
     private FilterConfig config = null;
 
     /**
-     * Minimal reasonable threshold.
-     */
-    private int minThreshold = 128;
-
-    /**
      * The threshold number to compress.
      */
     protected int compressionThreshold = 0;
-
-    /**
-     * Minimal reasonable buffer.
-     */
-    private int minBuffer = 8192;  // 8KB is what tomcat would use by default anyway
 
     /**
      * The compression buffer size to avoid chunking.
@@ -94,24 +96,24 @@ public class CompressionFilter implements Filter {
             String str = filterConfig.getInitParameter("compressionThreshold");
             if (str!=null) {
                 compressionThreshold = Integer.parseInt(str);
-                if (compressionThreshold != 0 && compressionThreshold < minThreshold) {
+                if (compressionThreshold != 0 && compressionThreshold < MIN_THRESHOLD) {
                     if (debug > 0) {
-                        System.out.println("compressionThreshold should be either 0 - no compression or >= " + minThreshold);
-                        System.out.println("compressionThreshold set to " + minThreshold);
+                        System.out.println("compressionThreshold should be either 0 - no compression or >= " + MIN_THRESHOLD);
+                        System.out.println("compressionThreshold set to " + MIN_THRESHOLD);
                     }
-                    compressionThreshold = minThreshold;
+                    compressionThreshold = MIN_THRESHOLD;
                 }
             }
 
             str = filterConfig.getInitParameter("compressionBuffer");
             if (str!=null) {
                 compressionBuffer = Integer.parseInt(str);
-                if (compressionBuffer < minBuffer) {
+                if (compressionBuffer < MIN_BUFFER) {
                     if (debug > 0) {
-                        System.out.println("compressionBuffer should be >= " + minBuffer);
-                        System.out.println("compressionBuffer set to " + minBuffer);
+                        System.out.println("compressionBuffer should be >= " + MIN_BUFFER);
+                        System.out.println("compressionBuffer set to " + MIN_BUFFER);
                     }
-                    compressionBuffer = minBuffer;
+                    compressionBuffer = MIN_BUFFER;
                 }
             }
 
@@ -135,7 +137,8 @@ public class CompressionFilter implements Filter {
                 }
 
                 if (debug > 0) {
-                    System.out.println("compressionMimeTypes set to " + compressionMimeTypes);
+                    System.out.println("compressionMimeTypes set to " +
+                            Arrays.toString(compressionMimeTypes));
                 }
             }
         }
@@ -178,7 +181,7 @@ public class CompressionFilter implements Filter {
 
         if (compressionThreshold == 0) {
             if (debug > 0) {
-                System.out.println("doFilter got called, but compressionTreshold is set to 0 - no compression");
+                System.out.println("doFilter got called, but compressionThreshold is set to 0 - no compression");
             }
             chain.doFilter(request, response);
             return;

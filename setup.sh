@@ -37,7 +37,7 @@ function _tui_front()
 function _com_chk_eula()
 {  
 
-	if (whiptail --scrolltext --title "End user license agreement" --textbox engine/LICENSE 40 90 ) then 
+	if (whiptail --scrolltext --title "End user license agreement" --textbox engine/LICENSE 30 60 ) then 
 		if (whiptail --title "Question" --yes-button "Agree" --no-button "Not Agree" --yesno "Are you agree?" 10 60) then    
 			_RET=$?
 		fi 
@@ -50,7 +50,10 @@ function _tui_install()
 	if [ $_RET == 0 ]; then   
 		exit
 	else
-		_com_chk_eula
+		_com_chk_eula   
+		if [ $_RET == 1 ] ; then 
+			exit
+		fi
 	fi
 
 	WASUSER=`whoami` 
