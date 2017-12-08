@@ -16,7 +16,7 @@ _RET=0
 function _com_chk_install() 
 { 
 	if [ -f ./cwas ]; then  
-		whiptail --msgbox "Already installed Chlux Web Application Server"  8 50
+		whiptail --msgbox "Already installed Chlux Web Application Server"  8 80
 	else 
 		_RET=1
 	fi 
@@ -36,13 +36,12 @@ function _tui_front()
     echo -e ""                                                 >> _frontbox
     #eval printf %.0s\# '{1..'${COLUMNS:-$(tput cols)}'}'; echo >> _frontbox  
 	whiptail --textbox _frontbox 14 80
-
 }
 function _com_chk_eula()
 {  
 
 	if (whiptail --scrolltext --title "End user license agreement" --textbox engine/LICENSE 30 80 ) then 
-		if (whiptail --title "Question" --yes-button "Agree" --no-button "Not Agree" --yesno "Are you agree?" 10 60) then    
+		if (whiptail --title "Question" --yes-button "Agree" --no-button "Not Agree" --yesno "Are you agree?" 10 80) then
 			_RET=$?
 		fi 
 	fi
@@ -101,8 +100,6 @@ function _tui_install()
         useradd ${GROUP_SW} -M -r -d ${currentDir} ${WASUSER} -s /bin/bash > /dev/null 
         whiptail --msgbox "Create ["${WASUSER}"/"${WASGROUP}"] for WAS" 10 90
     fi 
-    /bin/rm -f 1 
-	/bin/rm _fronbox
 	#echo "(Exit status was $exitstatus)"	
 } 
 
@@ -252,7 +249,8 @@ JAVA_OPTS=""
 
 _tui_install
 _tui_setlauncher
-
+/bin/rm -f 1
+/bin/rm -f _frontbox
 
 #_tui_front  
 ############################_
