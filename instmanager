@@ -203,7 +203,7 @@ addInst() {
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.https=\$sia_https\"" >>           ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.redirect=\$sia_redirect\"" >>     ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.ajp=\$sia_ajp\"" >>               ${INSTDIR}/${CONF}
-    echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.jvmroute=\$sia_instname\"" >>     ${INSTDIR}/${CONF} 
+    echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.jvmroute=\$sia_jvmroute\"" >>     ${INSTDIR}/${CONF} 
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.serviceip=\$sia_serviceip\"" >>     ${INSTDIR}/${CONF} 
    #echo -e "export \"JAVA_OPTS=\$JAVA_OPTS ${OPT}" >> ${INSTDIR}/${CONF} 
     
