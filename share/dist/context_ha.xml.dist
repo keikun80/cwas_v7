@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -18,48 +18,18 @@
 <!-- The contents of this file will be loaded for each web application -->
 <Context>
 
-    <!-- Default set of monitored resources. If one of these changes, the    -->
-    <!-- web application will be reloaded.                                   -->
+    <!-- Default set of monitored resources -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
-    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
-  <Manager className="org.apache.catalina.ha.session.DeltaManager"
-                   expireSessionsOnShutdown="false"
-                   notifyListenersOnReplication="true"/>
-
-          <Channel className="org.apache.catalina.tribes.group.GroupChannel">
-            <Membership className="org.apache.catalina.tribes.membership.McastService"
-                        address="228.0.0.4"
-                        port="45564"
-                        frequency="500"
-                        dropTime="3000"/>
-            <Receiver className="org.apache.catalina.tribes.transport.nio.NioReceiver"
-                      address="auto"
-                      port="4000"
-                      autoBind="100"
-                      selectorTimeout="5000"
-                      maxThreads="6"/>
-
-            <Sender className="org.apache.catalina.tribes.transport.ReplicationTransmitter">
-              <Transport className="org.apache.catalina.tribes.transport.nio.PooledParallelSender"/>
-            </Sender>
-            <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
-            <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor"/>
-          </Channel>
-
-          <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
-                 filter=""/>
-          <Valve className="org.apache.catalina.ha.session.JvmRouteBinderValve"/>
-
-          <Deployer className="org.apache.catalina.ha.deploy.FarmWarDeployer"
-                    tempDir="/tmp/war-temp/"
-                    deployDir="/tmp/war-deploy/"
-                    watchDir="/tmp/war-listen/"
-                    watchEnabled="false"/>
-
-          <ClusterListener className="org.apache.catalina.ha.session.ClusterSessionListener"/>
 
     <!-- Uncomment this to disable session persistence across Tomcat restarts -->
     <!--
     <Manager pathname="" />
     -->
+
+    <!-- Uncomment this to enable Comet connection tacking (provides events
+         on session expiration as well as webapp lifecycle) -->
+    <!--
+    <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
+    -->
+	<!-- <context path="/webapps" allowlinking="true"> -->
 </Context>

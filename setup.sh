@@ -263,8 +263,9 @@ function _setlauncher()
     chmod 700 ./cwas
     if [ ! -d instnace ]; then 
         mkdir -p instance
-    fi
-    chown -R ${WAS_USER}. ${currentDir}
+    fi 
+    chown -R ${WAS_USER}. ${currentDir} 
+	
 }
 
 function _footer() 
