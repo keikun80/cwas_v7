@@ -10,7 +10,7 @@ INSTDIR=${INSTROOT}/instance/${INSTNAME}
 CONFDIR="conf/"  
 CONFIG="sia.conf"
 CONF=${CONFDIR}${CONFIG}     
-
+serviceip=`hostname -i`
 function _front()
 { 
     TITLE="CHLUX WEB APPLICATION SERVER INSTANCE MANAGER"
@@ -18,7 +18,7 @@ function _front()
     eval printf %.0s\# '{1..'${COLUMNS:-$(tput cols)}'}'; echo    
     echo -e "" 
     printf "%*s\n" $(((${#TITLE}+$(tput cols))/2)) "$TITLE"
-    echo -e "\t Version : 1.0.2c" 
+    echo -e "\t Version : `cat version`" 
     echo -e "\t Author  : Chlux Co,Ltd."
     echo -e ""
     eval printf %.0s\# '{1..'${COLUMNS:-$(tput cols)}'}'; echo   
@@ -140,7 +140,7 @@ addInst() {
     fi 
  
     echo "iNSTNACE NAME : " ${INSTNAME}""
-    echo -n "SERVICE IP :" 
+    echo -n "SERVICE IP : (default : ${serviceip}) : " 
     read sip
     if [[ $sip ]]; then
        serviceip=${sip} 
@@ -220,9 +220,13 @@ addInst() {
     cp ${INSTROOT}/share/dist/server.xml.dist ${INSTDIR}/${CONFDIR}/server.xml
     cp ${INSTROOT}/share/dist/server_ha.xml.dist ${INSTDIR}/${CONFDIR}/server_ha.xml
     cp ${INSTROOT}/share/dist/context_ha.xml.dist ${INSTDIR}/${CONFDIR}/context_ha.xml
-    cp ${INSTROOT}/share/dist/web_ha.xml.dist ${INSTDIR}/${CONFDIR}/web_ha.xml 
+    #cp ${INSTROOT}/share/dist/web_ha.xml.dist ${INSTDIR}/${CONFDIR}/web_ha.xml 
 	cp ${INSTROOT}/share/dist/session.jsp ${INSTDIR}/webapps/ROOT/session.jsp
-
+    echo ""
+    echo "----------- for clustering -------------"
+    cat ${INSTROOT}/share/dist/ha_install.txt
+    echo ""
+	
 
 } 
 removeInst() {  
