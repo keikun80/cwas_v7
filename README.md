@@ -1,3 +1,6 @@
+## Download stable version 
+https://github.com/chluxossteam/cwas_v7/releases/tag/v1.0.2f
+
 ## Requirement 
  WAS Account 
  WAS home directory
