@@ -68,7 +68,7 @@
     -->
     <Connector port="${tomcat.port.http}" protocol="HTTP/1.1"
                connectionTimeout="20000"
-               redirectPort="8443" />
+               redirectPort="${tomcat.port.redirect}" />
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
