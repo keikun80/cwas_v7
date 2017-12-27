@@ -103,7 +103,7 @@ _setjavaopt()
         #OPT="export \"JAVA_OPTS=\$JAVA_OPTS -Xms128m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=1024m\""
     fi  
 	
-	FIXEDOPT="export \"JAVA_OPTS=\$JAVA_OPTS -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -Djava.awt.headless=true -Dcom.sun.management.jmxremote\""
+	FIXEDOPT="export \"JAVA_OPTS=\$JAVA_OPTS -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -Xloggc:${INSTDIR}/gclogs/gc.log -Djava.awt.headless=true -Dcom.sun.management.jmxremote\""
     
     echo -e "export \"JAVA_OPTS=\"\"\""  > .javaopts
 	echo -e "export JAVA_HOME=${temp_java_home}" >> .javaopts
@@ -118,6 +118,7 @@ _setDefault()
     httpsport=8443
     redport=${httpsport}
     ajpport=8009
+	receiveport=4000
 }
 addInst() { 
 
@@ -144,27 +145,32 @@ addInst() {
     if [[ $sip ]]; then
        serviceip=${sip} 
     fi 
-    echo -n "SHUTDOWN PORT (default : 8005) :" 
+    echo -n "NIO RECEIVE PORT (default : ${receiveport}) : " 
+    read rport
+    if [[ $rport ]]; then
+       receiveport=${rport} 
+    fi 
+    echo -n "SHUTDOWN PORT (default : ${shutdownport}) : " 
     read sport
     if [[ $sport ]]; then
        shutdownport=${sport} 
     fi 
-    echo -n "HTTP PORT     (default : 8080) :"
+    echo -n "HTTP PORT     (default : ${httpport}) : "
     read hport 
     if [[ $hport ]]; then
        httpport=${hport} 
     fi 
-    echo -n "HTTPS PORT    (default : 8443) : "
+    echo -n "HTTPS PORT    (default : ${httpsport}) : "
     read hsport
     if [[ $hsport ]]; then
        httpsport=${hsport} 
     fi 
-    echo -n "REDIRECT PORT (default : 8443) : "
-    read rport
-    if [[ $rport ]]; then
-      redport=${rport} 
+    echo -n "REDIRECT PORT (default : ${redport}) : "
+    read rdport
+    if [[ $rdport ]]; then
+      redport=${rdport} 
     fi 
-    echo -n "AJP PORT      (default : 8009) : "
+    echo -n "AJP PORT      (default : ${ajpport}) : "
     read aport 
     if [[ $aport ]]; then
       ajpport=${aport} 
@@ -178,21 +184,23 @@ addInst() {
     mkdir -p ${INSTDIR}/logs
     mkdir -p ${INSTDIR}/temp
     mkdir -p ${INSTDIR}/work
+    mkdir -p ${INSTDIR}/gclogs
 
     cp -r share/conf ${INSTDIR}/.
     cp -r share/webapps ${INSTDIR}/.
    
     echo "Create ${INSTNAME} instance configuration"
 
-    echo -e "#!/bin/bash"  >>                                                       ${INSTDIR}/${CONF}
-    echo -e "sia_instname=\"${INSTNAME}\"" >>                                       ${INSTDIR}/${CONF}
-    echo -e "sia_shutdown=${shutdownport}" >>                                       ${INSTDIR}/${CONF}
-    echo -e "sia_http=${httpport}" >>                                               ${INSTDIR}/${CONF}
-    echo -e "sia_https=${httpsport}" >>                                             ${INSTDIR}/${CONF}
-    echo -e "sia_redirect=${redport}" >>                                            ${INSTDIR}/${CONF}
-    echo -e "sia_ajp=${ajpport} " >>                                                ${INSTDIR}/${CONF}
-    echo -e "sia_jvmroute=\"${INSTNAME}\"" >>                                       ${INSTDIR}/${CONF} 
-    echo -e "sia_serviceip=\"${serviceip}\"" >>                                       ${INSTDIR}/${CONF} 
+    echo -e "#!/bin/bash"  >>                                ${INSTDIR}/${CONF}
+    echo -e "sia_instname=\"${INSTNAME}\"" >>                ${INSTDIR}/${CONF}
+    echo -e "sia_shutdown=${shutdownport}" >>                ${INSTDIR}/${CONF}
+    echo -e "sia_http=${httpport}" >>                        ${INSTDIR}/${CONF}
+    echo -e "sia_https=${httpsport}" >>                      ${INSTDIR}/${CONF}
+    echo -e "sia_redirect=${redport}" >>                     ${INSTDIR}/${CONF}
+    echo -e "sia_ajp=${ajpport} " >>                         ${INSTDIR}/${CONF}
+    echo -e "sia_jvmroute=\"${INSTNAME}\"" >>                ${INSTDIR}/${CONF} 
+    echo -e "sia_serviceip=\"${serviceip}\"" >>              ${INSTDIR}/${CONF} 
+    echo -e "sia_receiveport=\"${receiveport}\"" >>          ${INSTDIR}/${CONF} 
    
 
     cat .javaopts >> ${INSTDIR}/${CONF}
@@ -205,6 +213,7 @@ addInst() {
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.ajp=\$sia_ajp\"" >>               ${INSTDIR}/${CONF}
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.jvmroute=\$sia_jvmroute\"" >>     ${INSTDIR}/${CONF} 
     echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.serviceip=\$sia_serviceip\"" >>     ${INSTDIR}/${CONF} 
+    echo -e "export \"JAVA_OPTS=\$JAVA_OPTS -Dtomcat.port.receiveport=\$sia_receiveport\"" >>     ${INSTDIR}/${CONF} 
    #echo -e "export \"JAVA_OPTS=\$JAVA_OPTS ${OPT}" >> ${INSTDIR}/${CONF} 
     
     #cat .javaopts >> ${INSTDIR}/${CONF}
@@ -221,7 +230,17 @@ removeInst() {
 }
 
 _confirm()
-{ 
+{  
+    declare -l temp_instname
+    declare -l temp_cwasuser
+    temp_instname=${INSTNAME}
+    temp_cwasuser=${CWAS_USER}
+    if [ ${temp_instname} == ${temp_cwasuser} ]; then
+        echo "Cannot create instnace name same as was owner"
+        echo ""
+        exit
+    fi
+
     echo "Will you create instance  : ${INSTNAME}" 
     read -r -p "Continue[y/N] : " response
     case ${response} in

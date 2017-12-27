@@ -150,7 +150,7 @@
            <!-- replication 메시지 수신 포트는 4000 - 4100 사이 -->
            <Receiver className="org.apache.catalina.tribes.transport.nio.NioReceiver"
                      address="${tomcat.port.serviceip}"
-                     port="4000"
+                     port="${tomcat.port.receiveport}"
                      autoBind="100"
                      selectorTimeout="5000"
                      maxThreads="6"/>
@@ -173,7 +173,7 @@
                    watchDir="/tmp/war-listen/"
                    watchEnabled="false"/>
            -->
-
+		<ClusterListener className="org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener"/>
          <ClusterListener className="org.apache.catalina.ha.session.ClusterSessionListener"/>
        </Cluster>
 

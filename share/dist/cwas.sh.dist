@@ -1,5 +1,4 @@
 #!/bin/sh
-fdf
 getInstance(){ 
 	instanceList=`ls ${currentDir}/instance/ | wc -l`    
 	if [ $instanceList -gt 0 ]; then
@@ -29,7 +28,7 @@ cwas_header() {
     echo " "
     sia_line
     echo -e " "
-    echo -e "   \e[1;34m Chlux Web Application Server 1.0.2c" 
+    echo -e "   \e[1;34m Chlux Web Application Server `cat version`" 
     echo -e " "
     echo -e "    Website      : http://www.github.com/chluxossteam"
     echo -e "    Pubilshed by : chluxossteam <help@chlux.co.kr>"
@@ -269,6 +268,15 @@ getInstance
 cwas_footer 
 
 #. $CATALINA_BASE/conf/sia.conf 
+declare -l temp_instname
+declare -l temp_cwasuser
+temp_instname=${INSTNAME}
+temp_cwasuser=${CWAS_USER}
+if [ ${temp_instname} == ${temp_cwasuser} ]; then
+    echo "Cannot create instnace name same as was owner"
+    echo ""
+    exit
+fi
 
 
 

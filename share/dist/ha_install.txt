@@ -1,0 +1,4 @@
+1. Copy Sserver.xml for clustering 
+# cp server_ha.xml to conf/server.xml 
+
+2.  add <distrituable/> tag in WEB-INF/web.xml for your application
