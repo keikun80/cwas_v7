@@ -1,8 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 
 INSTNAME=$1 
 ARGV=$2   
 INSTROOT=`pwd`   
+UNAME=`id -u -n`
 CWAS_USER="CHANGE_HERE_FOR_WAS_USER"
 CWAS_GROUP="CHANGE_HERE_FOR_WAS_GROUP"  
 temp_java_home="/etc/alternatives/jre";
@@ -121,17 +122,6 @@ _setDefault()
 	receiveport=4000
 }
 addInst() { 
-
-    #INSTROOT=`pwd` 
-    #INSTDIR=${INSTROOT}/instance/${INSTNAME}
-    #CONFDIR="conf/"  
-    #CONFIG="sia.conf"
-    #CONF=${CONFDIR}${CONFIG}    
-    
-    #if [ ! -f .javaopts ]; then  
-    #    echo -e "\e[31mCiritical] No file for setup JAVA_OTPS . Please run installer first\e[0m" 
-    #    exit;
-    #fi  
 
     if [ -d ${INSTDIR} ]; then  
         echo "Already exist Instance name (${INSTNAME})"
@@ -269,8 +259,6 @@ _usageprint()
 } 
 chkOwner()
 {
-    UNAME=`id -u -n`
-
     if [ $UNAME != ${CWAS_USER} ]; then
         echo "  Start failure WAS service. WAS control allow to [ ${CWAS_USER} ] user"
         exit
