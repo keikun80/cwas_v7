@@ -73,9 +73,9 @@
              <Connector executor="tomcatThreadPool"
                port="8080" protocol="HTTP/1.1"
                connectionTimeout="20000"
-               redirectPort="8443" />
+               redirectPort="${tomcat.port.redirect}" />
     -->
-    <!-- Define a SSL/TLS HTTP/1.1 Connector on port 8443
+    <!-- Define a SSL/TLS HTTP/1.1 Connector on port 8443 as ${tomcat.port.redirect}
                   This connector uses the NIO implementation that requires the JSSE
          style configuration. When using the APR/native implementation, the
          OpenSSL style configuration is required as described in the APR/native
