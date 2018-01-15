@@ -4,8 +4,8 @@ INSTNAME=$1
 ARGV=$2   
 INSTROOT=`pwd`   
 UNAME=`id -u -n`
-CWAS_USER="CHANGE_HERE_FOR_WAS_USER"
-CWAS_GROUP="CHANGE_HERE_FOR_WAS_GROUP"  
+CWAS_USER="kwas"
+CWAS_GROUP="kwas"  
 temp_java_home="/etc/alternatives/jre";
 INSTDIR=${INSTROOT}/instance/${INSTNAME}
 CONFDIR="conf/"  
@@ -23,7 +23,7 @@ function _front()
     echo -e "\t Author  : Chlux Co,Ltd."
     echo -e ""
     eval printf %.0s\# '{1..'${COLUMNS:-$(tput cols)}'}'; echo   
-	UNAME=`id -u -n`
+    UNAME=`id -u -n`
  
 } 
 
@@ -119,8 +119,46 @@ _setDefault()
     httpsport=8443
     redport=${httpsport}
     ajpport=8009
-	receiveport=4000
+    receiveport=4000
+}  
+
+_setSvcIP()
+{  
+    # $1 IP description (text)
+    # $2 variable's name of service ip 
+
+    stat=true
+    while [ $stat == true ];
+    do  
+        echo -n ${1}  ":" 
+        read  var
+        if [[ $var =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then  
+            eval $2=${var}  
+            stat=false
+        else 
+            echo "Please Enter validate IP address"
+            stat=true
+        fi   
+    done
 }
+_setPort()
+{ 
+    # $1 = Port description (Text)  
+    # $2 = default port number
+    # $3 = variable's name of port 
+    port=0  
+    while ! [ ${port} -gt 1 ]; do 
+        echo -n ${1} " (default : " ${2} ") : "
+        read var
+        if [[ $var -gt 0 ]]; then 
+            port=${var} 
+        else 
+            echo "Please enter "${1}" number"
+        fi
+    done
+    eval $3=${var}
+}
+
 addInst() { 
 
     if [ -d ${INSTDIR} ]; then  
@@ -130,41 +168,18 @@ addInst() {
     fi 
  
     echo "iNSTNACE NAME : " ${INSTNAME}""
-    echo -n "SERVICE IP : (default : ${serviceip}) : " 
-    read sip
-    if [[ $sip ]]; then
-       serviceip=${sip} 
-    fi 
-    echo -n "NIO RECEIVE PORT (default : ${receiveport}) : " 
-    read rport
-    if [[ $rport ]]; then
-       receiveport=${rport} 
-    fi 
-    echo -n "SHUTDOWN PORT (default : ${shutdownport}) : " 
-    read sport
-    if [[ $sport ]]; then
-       shutdownport=${sport} 
-    fi 
-    echo -n "HTTP PORT     (default : ${httpport}) : "
-    read hport 
-    if [[ $hport ]]; then
-       httpport=${hport} 
-    fi 
-    echo -n "HTTPS PORT    (default : ${httpsport}) : "
-    read hsport
-    if [[ $hsport ]]; then
-       httpsport=${hsport} 
-    fi 
-    echo -n "REDIRECT PORT (default : ${redport}) : "
-    read rdport
-    if [[ $rdport ]]; then
-      redport=${rdport} 
-    fi 
-    echo -n "AJP PORT      (default : ${ajpport}) : "
-    read aport 
-    if [[ $aport ]]; then
-      ajpport=${aport} 
-    fi 
+    #echo -n "SERVICE IP : (default : ${serviceip}) : "  
+    #read sip
+    #if [[ $sip ]]; then
+    #   serviceip=${sip} 
+    #fi  
+    _setSvcIP "SERVICE IP" serviceip 
+    _setPort "NIO RECEIVE PORT" ${receiveport} receiveport
+    _setPort "SHUTDOWN    PORT" ${shutdownport} shutdownport 
+    _setPort "HTTP        PORT" ${httpport} httpport
+    _setPort "HTTPS       PORT" ${httpsport} httpsport
+    _setPort "REDIRECT    PORT" ${redport} redport
+    _setPort "AJP         PORT" ${ajpport} ajpport  
 
     #echo -e "\e[32madd instance ${INSTNAME} \e[0m"
     echo  "Create instance directory : ${INSTNAME}"
