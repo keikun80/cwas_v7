@@ -181,7 +181,7 @@ addInst() {
    
     echo "Create ${INSTNAME} instance configuration"
 
-    echo -e "#!/bin/bash"  >>                                ${INSTDIR}/${CONF}
+    echo -e "#!/bin/sh"  >>                                  ${INSTDIR}/${CONF}
     echo -e "sia_instname=\"${INSTNAME}\"" >>                ${INSTDIR}/${CONF}
     echo -e "sia_shutdown=${shutdownport}" >>                ${INSTDIR}/${CONF}
     echo -e "sia_http=${httpport}" >>                        ${INSTDIR}/${CONF}

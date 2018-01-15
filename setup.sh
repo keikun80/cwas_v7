@@ -1,4 +1,4 @@
-#!/bin/bash  
+#!/bin/sh  
 
 
 currentDir=`pwd`;
@@ -97,7 +97,7 @@ function _tui_install()
             groupadd ${WASGROUP}
         fi
         GROUP_SW="-g ${WASGROUP}"
-        useradd ${GROUP_SW} -M -r -d ${currentDir} ${WASUSER} -s /bin/bash > /dev/null 
+        useradd ${GROUP_SW} -M -r -d ${currentDir} ${WASUSER} -s /bin/sh > /dev/null 
         whiptail --msgbox "Create ["${WASUSER}"/"${WASGROUP}"] for WAS" 10 90
     fi 
 	#echo "(Exit status was $exitstatus)"	
@@ -133,7 +133,7 @@ function _checkuser()
             groupadd ${WAS_GROUP}
         fi
         GROUP_SW="-g ${WAS_GROUP}"
-        useradd ${GROUP_SW} -M -r -d ${currentDir} ${WAS_USER} -s /bin/bash > /dev/null 
+        useradd ${GROUP_SW} -M -r -d ${currentDir} ${WAS_USER} -s /bin/sh > /dev/null 
         echo -e "\e[32m --Create USER/GROUP for Apache (${WAS_USER}/${WAS_GROUP})\e[0m"
     fi 
     /bin/rm -f 1
