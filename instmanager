@@ -3,9 +3,9 @@
 INSTNAME=$1 
 ARGV=$2   
 INSTROOT=`pwd`   
-UNAME=`id -u -n`
-CWAS_USER="kwas"
-CWAS_GROUP="kwas"  
+UNAME=`id -u -n` 
+CWAS_USER="CHANGE_HERE_FOR_WAS_USER"
+CWAS_GROUP="CHANGE_HERE_FOR_WAS_GROUP"
 temp_java_home="/etc/alternatives/jre";
 INSTDIR=${INSTROOT}/instance/${INSTNAME}
 CONFDIR="conf/"  
